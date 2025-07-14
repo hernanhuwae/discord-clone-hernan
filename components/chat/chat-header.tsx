@@ -10,7 +10,6 @@ interface IChatHeader{
     imageUrl?: string
 }
 
-
 export const ChatHeader = ({serverId,name,type,imageUrl}:IChatHeader)=> {
 
     return(

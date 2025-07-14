@@ -13,60 +13,62 @@ export default async function handler(req: NextApiRequest, res:NextApiResponseSe
     try {
 
         const profile = await currentProfileSocket(req)
-        const {messageId, serverId, channelId} = req.query //Todo: 'messageId' didapat dari penamaan file ini [messageId].ts
+        const {privatemessageId,conversationId} = req.query //Todo: 'messageId' didapat dari penamaan file ini [privatemessageId].ts
         const {content} = req.body
 
         if(!profile){
             return res.status(400).json({error: 'Unauthorized'})
         }
 
-        if(!serverId){
-            return res.status(400).json({error: 'Server ID Is Missing'})
+        if(!conversationId){
+            return res.status(400).json({error : 'CONVERSATION ID IS NOT FOUND'})
         }
 
-        if(!channelId){
-            return res.status(400).json({error: 'Channel ID Is Missing'})
-        }
-
-        const server = await prismaDb.server.findFirst({
-            where:{
-                id: serverId as string,
-                Member: {
-                    some: {
-                        profileId: profile.id
+        
+        const conversation = await prismaDb.conversation.findFirst({
+            where : {
+                id : conversationId as string,
+                OR : [
+                    {
+                        memberOne : {
+                            profileId : profile.id
+                        }
+                    },
+                    {
+                        memberTwo : {
+                            profileId : profile.id
+                        }
+                    }
+                ]
+            },
+            include : {
+                memberOne : {
+                    include : {
+                        profile : true
+                    }
+                },
+                memberTwo : {
+                    include : {
+                        profile : true
                     }
                 }
-            },
-            include: {
-                Member: true  //Todo: Butuh member karena nantinya server membutuhkan member agar bisa ambil profile ID tiap user yang terdaftar di server untuk relasi ke tabel Message (untuk PATCH/DELETE) agar kita bisa Edit/Delete message tertentu
             }
         })
-
-        if(!server){
-            return res.status(400).json({error: 'Server is Missing'})
+        
+        if(!conversation){
+            return res.status(400).json({error : 'CONVERSATION IS NOT FOUND'})
         }
 
-        const channel = await prismaDb.channel.findFirst({
-            where: {
-                id: channelId as string,
-                serverId: serverId as string
-            }
-        })
-
-        if(!channel){
-            return res.status(400).json({error: 'Channel is Missing'})
-        }
-
-        const member = server.Member.find((members)=> members.profileId === profile.id)
+        const member = conversation.memberOne.profileId === profile.id ? conversation.memberOne : conversation.memberTwo
 
         if(!member){
             return res.status(400).json({error: 'Member is Missing'})
         }
 
-        let message = await prismaDb.message.findFirst({
+        let privatemessage = await prismaDb.privateMessage.findFirst({
             where:{
-                id: messageId as string,
-                channelId: channelId as string
+                id: privatemessageId as string,
+                conversationId : conversationId as string
             },
             include:{
                 member:{
@@ -77,11 +79,11 @@ export default async function handler(req: NextApiRequest, res:NextApiResponseSe
             }
         })
 
-        if(!message || message.deleted){
-            return res.status(400).json({error: 'Message is Missing'})
+        if(!privatemessage || privatemessage.deleted){
+            return res.status(400).json({error: 'Private Message is Missing'})
         }
 
-        const isOwnerMessage = message.memberId === member.id
+        const isOwnerMessage = privatemessage.memberId === member.id
         const isAdmin = member.role === MemberRole.ADMIN
         const isModerator = member.role === MemberRole.MODERATOR
 
@@ -93,9 +95,9 @@ export default async function handler(req: NextApiRequest, res:NextApiResponseSe
 
         //Delete Message
         if(req.method === 'DELETE'){
-              message = await prismaDb.message.update({
+              privatemessage = await prismaDb.privateMessage.update({
               where: {
-                id: messageId as string
+                id: privatemessageId as string
               },
               data:{
                 fileUrl: null,
@@ -120,9 +122,9 @@ export default async function handler(req: NextApiRequest, res:NextApiResponseSe
                 return res.status(400).json({error: 'Unauthorized'})
             }
 
-              message = await prismaDb.message.update({
+              privatemessage = await prismaDb.privateMessage.update({
               where: {
-                id: messageId as string
+                id: privatemessageId as string
               },
               data:{
                 content
@@ -137,14 +139,14 @@ export default async function handler(req: NextApiRequest, res:NextApiResponseSe
             })
         }
         
-        const updateKey = `chat:${channelId}:message:update`
+        const updateKey = `chat:${conversation.id}:messages:update`
         
-        res?.socket?.server?.io?.emit(updateKey,message)
-        return res.status(200).json(message)
+        res?.socket?.server?.io?.emit(updateKey)
+        return res.status(200).json(privatemessage)
 
     } catch (error) {
-        console.log('[MESSAGE_ID]', error)
-        return res.status(500).json({error: 'Internal Message_ID Error'})
+        console.log('[PRIVATE_MESSAGE_ID]', error)
+        return res.status(500).json({error: 'Internal Private_Message_ID Error'})
         
     }
 

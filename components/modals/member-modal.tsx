@@ -21,6 +21,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 export const MembersModal = () => {
+
   const router = useRouter()
   const { onOpen, isOpen, onClose, type, data } = useModalStores();
   const { server } = data as { server: ServerWithMemberWithProfile };
@@ -153,12 +154,12 @@ export const MembersModal = () => {
                       </div>
                     )}
                     {loadingId === members.id && (
-                      <Loader2 className="w-4 h-4 animate-spin text-zinc-500 ml-auto"/>
+                      <Loader2 className="w-4 h-4 animate-spin text-green-500 ml-auto"/>
                     )}
               </div>
             ))}
         </ScrollArea>
-        <div className="p-5">hello</div>
+        <div className="p-5"></div>
       </DialogContent>
     </Dialog>
   );

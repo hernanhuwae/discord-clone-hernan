@@ -36,8 +36,13 @@ export const ServerChannel = ({channel,server,role}:IServerChannel)=> {
     //maka dibuat secara terpisah agar tidak berpengaruh
 
     const onAction = (e:React.MouseEvent, action:ModalType) => {
+
         e.stopPropagation()
-        onOpen(action, {server,channel})
+
+        //Todo: Server & Channel dibutuhkan disini buat props ke editChannel & deleteChannel modal yang akan bawa data server&channel ke 2 modal tersebut (sebagai global state dari zustand)
+        //Todo: konsepnya sama dengan manage user di (serverHeader) yg panggil onOpen() utk isi data {server:servers} -> ke editServer modal tinggal onClose()
+        onOpen(action, {server:server , channel:channel}) 
+
     }
 
     return(
@@ -64,6 +69,7 @@ export const ServerChannel = ({channel,server,role}:IServerChannel)=> {
                     </ActionTooltip>
                 </div>
             )}
+            
             {channel.name === 'general' && (
                 <Lock className="w-4 h-4 ml-auto text-zinc-500 dark:text-zinc-400"/>
             )}

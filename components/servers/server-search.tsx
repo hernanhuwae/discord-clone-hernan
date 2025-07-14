@@ -14,9 +14,10 @@ interface IServerSearch {
     type: "channel" | "member";
     data:
       | {
+          id: string;
           icon: React.ReactNode;
           name: string;
-          id: string;
+          
         }[]
       | undefined;
   }[];

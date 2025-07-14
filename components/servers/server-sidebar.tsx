@@ -16,6 +16,7 @@ interface IServersidebar {
 }
 
 export const ServerSidebar = async ({ serverId }: IServersidebar) => {
+
   const profile = await currentProfile();
 
   if (!profile) {
@@ -29,7 +30,7 @@ export const ServerSidebar = async ({ serverId }: IServersidebar) => {
     include: {
       Channel: {
         orderBy: {
-          createAt: "asc",
+          createdAt: "asc",
         },
       },
       Member: {
@@ -42,6 +43,8 @@ export const ServerSidebar = async ({ serverId }: IServersidebar) => {
       },
     },
   });
+
+
 
   const textChannel = server?.Channel.filter(
     (channel) => channel.type === ChannelType.TEXT
@@ -127,6 +130,7 @@ export const ServerSidebar = async ({ serverId }: IServersidebar) => {
         <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2 " />
 
         {/* //Todo : !! artinya boolean dan ini bagian server side channels & member */}
+        {/* //Todo 2 :  Kalau textChannel kosong (length = 0) atau undefined, maka !!0 = false, jadi div-nya nggak dirender sama sekali. */}
 
         {!!textChannel?.length && (
           <div className="mb-2">

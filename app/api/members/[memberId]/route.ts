@@ -74,6 +74,7 @@ export async function DELETE (req: Request, {params: paramsPromise} : {params : 
         const params = await paramsPromise
         const {searchParams} = new URL (req.url)
 
+         // Todo: Untuk akses ke API ServerID '/api/servers/[serverId]'
         const serverId = searchParams.get('serverId')
 
         if(!profile){

@@ -27,7 +27,7 @@ export async function POST (req:Request){
                 },
                 Member:{
                     create:[
-                        {profileId: profile.id, role: MemberRole.ADMIN}
+                        {profileId: profile.id, role: MemberRole.ADMIN} //Todo: sebagai member pertama dan menjadi ADMIN. Kalo tdk dibuat maka gaada member sama sekali di server yang dibuatnya
                     ]
                 }
             }

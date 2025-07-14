@@ -25,7 +25,7 @@ export async function POST (req: Request){
         }
 
 
-        //Todo: Mengapa memakai update bukan create? karena kita hanya menambahkan channel baru dalam server saat ini, makanya memakai update agar kita tidak memebuat server baru
+        //Todo: Mengapa memakai update bukan create? karena kita hanya menambahkan channel baru dalam server saat ini, makanya memakai update agar kita tidak membuat server baru
 
         const server = await prismaDb.server.update({
             where:{

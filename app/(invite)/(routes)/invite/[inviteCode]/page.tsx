@@ -20,6 +20,8 @@ const InviteCodePage = async ({params} : IInviteCode) => {
         return redirect('/')
     }
 
+    // Todo : kondisi saat member sudah join server trus copas link invitecode di server yang sama/ server yang sudah join sebelumnya
+    
     const existingServer = await prismaDb.server.findFirst({
         where :{
             inviteCode: (await params).inviteCode,
@@ -30,6 +32,9 @@ const InviteCodePage = async ({params} : IInviteCode) => {
             }
         }
     })
+
+    //Todo: Saat kita tambah member baru, kita membuat profile Id-nya sebagai member dari server tersebut
+    //Todo: Kondisi saat member baru pertama kali join
 
     const server = await prismaDb.server.update({
         where: {

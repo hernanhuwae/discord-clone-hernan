@@ -28,7 +28,7 @@ const ChannelID = async ({params: paramsPromise}:IChannelId) => {
     }
   })
 
-  //Todo: Mengecek Apakah Pengguna adalah Member dari Server yang dimana Channel yang dijoinnya berada di server itu
+  //Todo: Mengkonfirmasi apakah user yg sedang login (currentUser) memiliki profile Id yang sama dengan MEMBER yg terdaftar pada Channel tertentu (ChannelId) dengan jg memiliki SERVER ID yang sama dengan Channel tertentu (ChannelId) yang sedang dituju
   const member = await prismaDb.member.findFirst({
     where: {
       serverId: params.serverId,
@@ -53,8 +53,8 @@ const ChannelID = async ({params: paramsPromise}:IChannelId) => {
           chatId={channel.id}
           type="channel"
           member={member}
-          apiUrl="/api/messages"
-          socketUrl="/api/socket/messages"
+          apiUrl="/api/messages"   //Todo: Buat GET Data messages
+          socketUrl="/api/socket/messages"  //Todo: Buat PATCH and DELETE Data Messages
           socketQuery={{
             channelId: channel.id,
             serverId: channel.serverId
@@ -65,7 +65,7 @@ const ChannelID = async ({params: paramsPromise}:IChannelId) => {
       <ChatInput
         name={channel.name}
         type="channel"
-        apiUrl="/api/socket/messages"
+        apiUrl="/api/socket/messages/message" //Todo: Endpoint akhirnya harus sesuai nama file 'message.ts' untuk POST
         query={{
           channelId: channel.id,
           serverId : channel.serverId

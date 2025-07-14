@@ -1,6 +1,6 @@
 import { currentProfile } from "@/lib/current-profile";
 import { prismaDb } from "@/lib/db";
-import { Message } from "@prisma/client";
+import { PrivateMessage } from "@prisma/client";
 import {  NextResponse } from "next/server";
 
 const MESSAGE_BATCH = 10
@@ -12,27 +12,27 @@ export async function GET(req: Request) {
         const profile = await currentProfile()
         const {searchParams} = new URL(req.url)
         const cursor = searchParams.get('cursor') //Todo: tangkap 'cursor' dari hook use-chat-query.ts
-        const channelId = searchParams.get('channelId')
+        const conversationId = searchParams.get('conversationId')
 
         if(!profile){
             return new NextResponse('Unauthorized' , {status: 400})
         }
 
-        if(!channelId){
-            return new NextResponse('Channel ID Is Missing', {status: 400})
+        if(!conversationId){
+            return new NextResponse('Conversation ID Is Missing', {status: 400})
         }
 
-        let messages : Message[] = []
+        let messages : PrivateMessage[] = []
 
         if(cursor){
-            messages = await prismaDb.message.findMany({
+            messages = await prismaDb.privateMessage.findMany({
                 take: MESSAGE_BATCH,
                 skip: 1,
                 cursor : {
                     id : cursor
                 },
                 where: {
-                    channelId: channelId
+                    conversationId
                 },
                 include: {
                     member: {
@@ -42,14 +42,14 @@ export async function GET(req: Request) {
                     }
                 },
                 orderBy: {
-                    createdAt: 'desc'
+                    createdAt : 'desc'
                 }
             })
         }else{
-            messages = await prismaDb.message.findMany({
+            messages = await prismaDb.privateMessage.findMany({
                 take: MESSAGE_BATCH,
                 where:{
-                    channelId: channelId
+                    conversationId
                 },
                 include:{
                     member : {
@@ -76,8 +76,8 @@ export async function GET(req: Request) {
         })
 
     } catch (error) {
-        console.log('[MESSAGE_GET_ERROR]',error);
-        return new NextResponse('MESSAGE_GET_ERROR', {status:500})
+        console.log('[PRIVATE-MESSAGE_GET_ERROR]',error);
+        return new NextResponse('PRIVATE-MESSAGE_GET_ERROR', {status:500})
     }
 
 }

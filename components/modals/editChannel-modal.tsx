@@ -71,6 +71,7 @@ export const EditChannelModals = () => {
           serverId : server?.id
         }
       })
+      
       await axios.patch(url, values);
 
       form.reset();

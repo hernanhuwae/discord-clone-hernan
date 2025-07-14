@@ -25,7 +25,10 @@ export const InviteModal = () => {
   const {onOpen,isOpen, onClose ,type, data} = useModalStores()
   const {server} = data
   const origin = useOrigin()
+
+  //Todo: buat direct ke halaman (invite) setelah buat API update invitecode
   const inviteUrl = `${origin}/invite/${server?.inviteCode}`
+
   const isModalOpen = isOpen && type === "invite"
 
   const onCopy = () => {

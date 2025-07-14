@@ -46,7 +46,7 @@ export const ChatInput = ({apiUrl,query,name,type}:IChatInput) => {
             await axios.post(url,values)
             form.reset()
             router.refresh()
-            window.location.reload()
+            // window.location.reload()
         } catch (error) {
             console.log(error);   
         }

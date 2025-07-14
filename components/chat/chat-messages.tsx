@@ -4,9 +4,11 @@ import { Member, Message, Profile } from "@prisma/client"
 import { ChatWelcome } from "./chat-welcome"
 import { useChatQuery } from "@/hooks/use-chat-query"
 import { Loader2, ServerCrash } from "lucide-react"
-import { Fragment } from "react"
+import { ElementRef, Fragment, useRef } from "react"
 import { ChatBubble } from "./chat-bubble"
 import {format} from 'date-fns'
+import { useChatSocket } from "@/hooks/use-chat-socket"
+import { useChatScroll } from "@/hooks/use-chat-scroll"
 
 const FORMAT_DATE = "d MMM yyyy, HH:mm"
 
@@ -30,13 +32,35 @@ type MessageWithMemberWithProfile = Message & {
 
 export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,socketQuery,socketUrl,type}:IChatMessages) => {
 
-    const queryKey = `chat-${chatId}`
+    //Todo: Buat ada scroll previous message
+    const chatRef = useRef<HTMLDivElement>(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    //Todo: 3 variabel dibawah ini harus equal penulisannya seperti const updateKey di [messageId].ts dan penulisan const channelKey di message.ts (pages/api/socket/messages)
+    const queryKey = `chat:${chatId}`
+    const addKey = `chat:${chatId}:messages`
+    const updateKey = `chat:${chatId}:messages:update`
+
     const {data,fetchNextPage,hasNextPage,isFetchingNextPage,status} = useChatQuery({
         queryKey,
         apiUrl,
         paramKey: paramskey,
         paramValue: paramsValue
     })
+
+    useChatSocket({queryKey,addKey,updateKey})
+
+     //todo : Auto Scroll button
+    useChatScroll({
+        chatRef,
+        bottomRef,
+        loadMore: fetchNextPage,
+        shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+        count: data?.pages?.[0]?.items.length ?? 0,
+    })
+
+   
+
 
     if(status === 'pending'){
         return (
@@ -56,13 +80,35 @@ export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,so
     }
 
     return(
-        <div className="flex-1 flex flex-col py-4 overflow-y-auto">
-            <div className="flex-1"/>
-            <ChatWelcome
+        <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
+
+            {!hasNextPage && <div className="flex-1"/>}
+
+            {!hasNextPage && (
+                <ChatWelcome
                 type= {type}
                 name= {name}
             />
+            )}
+
+            {hasNextPage && (
+                <div className="flex justify-center">
+                    {isFetchingNextPage ? (
+                        <Loader2 className="w-7 h-7 animate-spin my-4"/>
+                    ): (
+                        <button   
+                            onClick={()=> fetchNextPage()}      
+                            className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 text-xs
+                                my-4 dark:hover:text-zinc-300 transition"
+                        > 
+                            Load Previous messages
+                        </button>
+                    )} 
+                </div>
+            )}
+
             {/* //Todo : FETCH ALL MESSAGES */ }
+            {/* Menggunkan <Fragment karena biar ga overload UI karena ada infinite scroll + useInfiniteQuery didalamnya biar DOM bisa tdk ada elemen tambahan biar layout bersih dan ringan */}
             <div className="flex flex-col-reverse mt-auto">
                 {data?.pages?.map((group,i)=>(
                     <Fragment key={i}>
@@ -75,8 +121,8 @@ export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,so
                                 content={message.content}
                                 fileUrl={message.fileUrl}
                                 deleted={message.deleted}
-                                isUpdated={message.updateAt !== message.createAt}
-                                timeStamp={format(new Date(message.createAt), FORMAT_DATE)}
+                                isUpdated={message.updatedAt !== message.createdAt}
+                                timeStamp={format(new Date(message.createdAt), FORMAT_DATE)}
                                 socketUrl={socketUrl}
                                 socketQuery={socketQuery}
                             />
@@ -84,6 +130,7 @@ export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,so
                     </Fragment>
                 ))}
             </div>
+            <div ref={bottomRef}/>
         </div>
     )
 

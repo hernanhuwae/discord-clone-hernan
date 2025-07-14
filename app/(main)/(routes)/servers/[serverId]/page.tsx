@@ -29,7 +29,7 @@ const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
           name: "general",
         },
         orderBy: {
-          createAt: "asc",
+          createdAt: "asc",
         },
       },
     },
