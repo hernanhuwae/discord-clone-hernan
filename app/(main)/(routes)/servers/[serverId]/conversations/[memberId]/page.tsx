@@ -1,6 +1,8 @@
 import { ChatHeader } from "@/components/chat/chat-header"
 import { ChatInput } from "@/components/chat/chat-input"
 import { ChatMessages } from "@/components/chat/chat-messages"
+import { ChatPrivateBubble } from "@/components/chat/chat-private-buble"
+import { ChatPrivateMessages } from "@/components/chat/chat-privatemessages"
 import { getOrCreateConversation } from "@/lib/conversation"
 import { currentProfile } from "@/lib/current-profile"
 import { prismaDb } from "@/lib/db"
@@ -55,7 +57,7 @@ const ConversationPage = async ({params:paramsPromise}:IConversation) => {
         type="conversation"
       />
 
-      <ChatMessages
+      <ChatPrivateMessages
         member={currentMember}
         name={otherMember.profile.name}
         chatId={conversation.id}

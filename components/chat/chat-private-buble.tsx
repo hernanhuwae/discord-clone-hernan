@@ -18,7 +18,7 @@ import axios from "axios";
 import { useModalStores } from "@/hooks/use-modal";
 import { useParams, useRouter } from "next/navigation";
 
-interface IChatBubble {
+interface IChatPrivateBubble {
   id: string;
   content: string;
   member: Member & {
@@ -39,7 +39,7 @@ const roleIcon = {
   ADMIN: <ShieldAlert className="h-4 w-4 text-rose-500" />,
 };
 
-export const ChatBubble = ({
+export const ChatPrivateBubble = ({
   id,
   content,
   currentMember,
@@ -50,14 +50,14 @@ export const ChatBubble = ({
   socketQuery,
   socketUrl,
   timeStamp,
-}: IChatBubble) => {
+}: IChatPrivateBubble) => {
  
   const isAdmin = currentMember.role === MemberRole.ADMIN;
   const isModerator = currentMember.role === MemberRole.MODERATOR;
   const isOwnerMessage = currentMember.id === member.id; //Todo: Pemilik/Pengirim pesan
-  const canDeleteMessage =!deleted && (isAdmin || isModerator || isOwnerMessage);
+  const canDeleteMessage =!deleted && (isOwnerMessage);
   const canEditMessage = !deleted && isOwnerMessage && !fileUrl;
-  const canDeletePrivateMessage = !deleted && (isOwnerMessage)
+ 
 
   const [isPdf, setIsPdf] = useState(false);
   const [isImage, setIsImage] = useState(false);
@@ -283,7 +283,7 @@ export const ChatBubble = ({
         >
           <ActionTooltip label="delete">
             <Trash
-              onClick={()=>onOpen('deleteMessage', {
+              onClick={()=>onOpen('deleteMessagePrivate', {
                 apiUrl: `${socketUrl}/${id}`,
                 query: socketQuery
               })}

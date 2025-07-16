@@ -9,6 +9,7 @@ import { ChatBubble } from "./chat-bubble"
 import {format} from 'date-fns'
 import { useChatSocket } from "@/hooks/use-chat-socket"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
+import { ChatPrivateBubble } from "./chat-private-buble"
 
 const FORMAT_DATE = "d MMM yyyy, HH:mm"
 
@@ -32,7 +33,7 @@ type MessageWithMemberWithProfile = Message & {
 
 
 
-export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,socketQuery,socketUrl,type}:IChatMessages) => {
+export const ChatPrivateMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,socketQuery,socketUrl,type}:IChatMessages) => {
 
     //Todo: Buat ada scroll previous message
     const chatRef = useRef<HTMLDivElement>(null);
@@ -117,11 +118,11 @@ export const ChatMessages = ({name,apiUrl,chatId,member,paramsValue,paramskey,so
                         {group.items.map((message: MessageWithMemberWithProfile)=>(
                             
                             
-                            <ChatBubble
+                            <ChatPrivateBubble
                                 key={message.id}
                                 id={message.id}
-                                currentMember={member} //Todo: User yang sedang login dalam sebuah channel
-                                member={message.member} //Todo: User/member sebagai pengirim pesan di chattingan dalam channel
+                                currentMember={member} //Todo: User yang sedang login dalam sebuah conversation
+                                member={message.member} //Todo: User/member sebagai pengirim pesan di chattingan dalam conversation
                                 content={message.content}
                                 fileUrl={message.fileUrl}
                                 deleted={message.deleted}
