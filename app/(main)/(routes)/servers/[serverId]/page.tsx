@@ -21,7 +21,11 @@ const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
   const server = await prismaDb.server.findUnique({
     where: {
       id: params.serverId,
-      profileId: profile.id,
+      Member : {
+        some : {
+          profileId: profile.id
+        }
+      }
     },
     include: {
       Channel: {
@@ -35,10 +39,17 @@ const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
     },
   });
 
+  console.log(server);
+  
+
+
   const initialChannel = server?.Channel[0];
+  
 
   if (initialChannel?.name !== "general") {
-    return null;
+    return (
+      <div className="flex items-center justify-center">NOT FOUND</div>
+    );
   }
 
   return redirect(`/servers/${params.serverId}/channels/${initialChannel?.id}`);

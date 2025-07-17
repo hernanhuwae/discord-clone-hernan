@@ -5,8 +5,8 @@ import { NextResponse } from "next/server"
 import {v4 as uuidv4} from 'uuid'
 
 export async function POST (req:Request){
-    try {
 
+    try {
         const {name, imageUrl} = await req.json()
         const profile = await currentProfile()
 
@@ -22,7 +22,7 @@ export async function POST (req:Request){
                 inviteCode: uuidv4(),
                 Channel: {
                     create:[
-                        {name: 'general', profileId: profile.id}
+                        {name: 'general', profileId: profile.id,}
                     ]
                 },
                 Member:{

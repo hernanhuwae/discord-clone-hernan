@@ -81,7 +81,7 @@ const ChannelID = async ({ params: paramsPromise }: IChannelId) => {
       {channel.type === ChannelType.AUDIO && (
         <>
           <MediaRoom
-            chatId={channel.id}
+            chatId={params.serverId}
             audio={true}
             video={false}
           />
@@ -92,7 +92,7 @@ const ChannelID = async ({ params: paramsPromise }: IChannelId) => {
       {channel.type === ChannelType.VIDEO && (
         <>
           <MediaRoom
-            chatId={channel.id}
+            chatId={params.serverId}
             audio={true}
             video={true}
           />
