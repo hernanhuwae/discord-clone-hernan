@@ -5,25 +5,25 @@ import { redirect } from "next/navigation";
 interface IServerId {
   params: Promise<{
     serverId: string;
-  }>
+  }>;
+
 }
 
 const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
 
   const params = await paramsPromise
-
   const profile = await currentProfile();
 
   if (!profile) {
     return redirect("/sign-in");
   }
 
-  const server = await prismaDb.server.findUnique({
+  const server = await prismaDb.server.findFirst({
     where: {
       id: params.serverId,
       Member : {
         some : {
-          profileId: profile.id
+          profileId : profile.id
         }
       }
     },
@@ -42,7 +42,6 @@ const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
   console.log(server);
   
 
-
   const initialChannel = server?.Channel[0];
   
 
@@ -54,5 +53,6 @@ const ServerIdPage = async ({ params:paramsPromise }: IServerId) => {
 
   return redirect(`/servers/${params.serverId}/channels/${initialChannel?.id}`);
 };
+
 
 export default ServerIdPage;

@@ -2,6 +2,7 @@ import { Hash } from "lucide-react"
 import { MobileToggle } from "../mobile-toggle"
 import { UserAvatar } from "../use-avatar"
 import { SocketIndicator } from "../socket-indicator"
+import { PrivateChatVC } from "../private-chat-vc"
 
 interface IChatHeader{
     serverId: string
@@ -30,6 +31,9 @@ export const ChatHeader = ({serverId,name,type,imageUrl}:IChatHeader)=> {
                 {name}
             </p>
             <div className="flex items-center ml-auto">
+                {type === 'conversation' && (
+                    <PrivateChatVC/>
+                )}
                 <SocketIndicator/>
             </div>
         </div>

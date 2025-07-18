@@ -12,9 +12,11 @@ interface IChannelId {
     serverId: string;
     channelId: string;
   }>;
+  
 }
 
 const ChannelID = async ({ params: paramsPromise }: IChannelId) => {
+
   const params = await paramsPromise;
   const profile = await currentProfile();
 
